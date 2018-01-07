@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 
-public class PlayerControl : MonoBehaviour
+public class PlayerControl : NetworkBehaviour
 {
 	[HideInInspector]
 	public bool facingRight = true;			// For determining which way the player is currently facing.
@@ -31,8 +32,14 @@ public class PlayerControl : MonoBehaviour
 		anim = GetComponent<Animator>();
 	}
 
+    private void Start()
+    {
+        if (!isLocalPlayer)
+            Destroy(this);
+    }
 
-	void Update()
+
+    void Update()
 	{
 		// The player is grounded if a linecast to the groundcheck position hits anything on the ground layer.
 		grounded = Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));  
