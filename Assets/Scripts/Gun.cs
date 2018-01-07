@@ -18,8 +18,18 @@ public class Gun : MonoBehaviour
 		playerCtrl = transform.root.GetComponent<PlayerControl>();
 	}
 
+    private void Start()
+    {
+        var pc = GetComponentInParent<PlayerControl>();
+        if(pc != null)
+        {
+            if (!pc.isLocalPlayer)
+                Destroy(this);
+        }
+    }
 
-	void Update ()
+
+    void Update ()
 	{
 		// If the fire button is pressed...
 		if(Input.GetButtonDown("Fire1"))

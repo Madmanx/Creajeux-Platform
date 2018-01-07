@@ -105,6 +105,7 @@ GameObject:
   - component: {fileID: 400016}
   - component: {fileID: 11400000}
   - component: {fileID: 8200000}
+  - component: {fileID: 114977380043796646}
   m_Layer: 9
   m_Name: Gun
   m_TagString: Untagged
@@ -514,7 +515,7 @@ AudioSource:
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 4
+    m_RotationOrder: 0
   spreadCustomCurve:
     serializedVersion: 2
     m_Curve:
@@ -538,7 +539,7 @@ AudioSource:
       tangentMode: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
-    m_RotationOrder: 4
+    m_RotationOrder: 0
 --- !u!82 &8200002
 AudioSource:
   m_ObjectHideFlags: 1
@@ -1299,3 +1300,35 @@ MonoBehaviour:
   m_SnapThreshold: 5
   m_InterpolateRotation: 1
   m_InterpolateMovement: 1
+--- !u!114 &114977380043796646
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 100016}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 106
+    i1: 161
+    i2: 135
+    i3: 188
+    i4: 99
+    i5: 57
+    i6: 132
+    i7: 52
+    i8: 121
+    i9: 192
+    i10: 63
+    i11: 223
+    i12: 215
+    i13: 20
+    i14: 4
+    i15: 163
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 1
