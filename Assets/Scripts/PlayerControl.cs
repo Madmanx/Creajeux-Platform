@@ -32,15 +32,12 @@ public class PlayerControl : NetworkBehaviour
 		anim = GetComponent<Animator>();
 	}
 
-    private void Start()
-    {
-        if (!isLocalPlayer)
-            Destroy(this);
-    }
-
 
     void Update()
 	{
+        if (!isLocalPlayer)
+            return;
+
 		// The player is grounded if a linecast to the groundcheck position hits anything on the ground layer.
 		grounded = Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));  
 
@@ -52,6 +49,9 @@ public class PlayerControl : NetworkBehaviour
 
 	void FixedUpdate ()
 	{
+        if (!isLocalPlayer)
+            return;
+
 		// Cache the horizontal input.
 		float h = Input.GetAxis("Horizontal");
 
@@ -144,4 +144,37 @@ public class PlayerControl : NetworkBehaviour
 			// Otherwise return this index.
 			return i;
 	}
+
+
+    [Command]
+    public void CmdDoFire()
+    {
+        var objgun = transform.GetChild(11);
+        var gun = objgun.GetComponent<Gun>();
+        // If the player is facing right...
+        if (facingRight)
+        {
+            // ... instantiate the rocket facing right and set it's velocity to the right. 
+            Rigidbody2D bulletInstance = Instantiate(gun.rocket, transform.position, Quaternion.Euler(new Vector3(0, 0, 0))) as Rigidbody2D;
+            bulletInstance.velocity = new Vector2(gun.speed, 0);
+            NetworkServer.Spawn(bulletInstance.gameObject);
+        }
+        else
+        {
+            // Otherwise instantiate the rocket facing left and set it's velocity to the left.
+            Rigidbody2D bulletInstance = Instantiate(gun.rocket, transform.position, Quaternion.Euler(new Vector3(0, 0, 180f))) as Rigidbody2D;
+            bulletInstance.velocity = new Vector2(-gun.speed, 0);
+            NetworkServer.Spawn(bulletInstance.gameObject);
+        }
+        RpcDoFire();
+    }
+
+    [ClientRpc]
+    public void RpcDoFire()
+    {
+        var gun = GetComponentInChildren<Gun>();
+        gun.ShootFX();
+
+
+    }
 }
