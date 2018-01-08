@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 
-public class Enemy : MonoBehaviour
+public class Enemy : NetworkBehaviour
 {
 	public float moveSpeed = 2f;		// The speed the enemy moves at.
 	public int HP = 2;					// How many times the enemy can be hit before it dies.
@@ -29,6 +30,9 @@ public class Enemy : MonoBehaviour
 
 	void FixedUpdate ()
 	{
+        if (!hasAuthority)
+            return;
+
 		// Create an array of all the colliders in front of the enemy.
 		Collider2D[] frontHits = Physics2D.OverlapPointAll(frontCheck.position, 1);
 
@@ -60,12 +64,15 @@ public class Enemy : MonoBehaviour
 	
 	public void Hurt()
 	{
+        if (!hasAuthority)
+            return;
 		// Reduce the number of hit points by one.
 		HP--;
 	}
 	
-	void Death()
-	{
+    [ClientRpc]
+    void RpcDeath()
+    {
 		// Find all of the sprite renderers on this object and it's children.
 		SpriteRenderer[] otherRenderers = GetComponentsInChildren<SpriteRenderer>();
 
@@ -78,6 +85,11 @@ public class Enemy : MonoBehaviour
 		// Re-enable the main sprite renderer and set it's sprite to the deadEnemy sprite.
 		ren.enabled = true;
 		ren.sprite = deadEnemy;
+    }
+
+	void Death()
+	{
+        RpcDeath();
 
 		// Increase the score by 100 points
 		score.score += 100;

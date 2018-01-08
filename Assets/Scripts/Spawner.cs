@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 
-public class Spawner : MonoBehaviour
+public class Spawner : NetworkBehaviour
 {
 	public float spawnTime = 5f;		// The amount of time between each spawn.
 	public float spawnDelay = 3f;		// The amount of time before spawning starts.
@@ -19,7 +20,8 @@ public class Spawner : MonoBehaviour
 	{
 		// Instantiate a random enemy.
 		int enemyIndex = Random.Range(0, enemies.Length);
-		Instantiate(enemies[enemyIndex], transform.position, transform.rotation);
+		var foe = Instantiate(enemies[enemyIndex], transform.position, transform.rotation);
+        NetworkServer.Spawn(foe);
 
 		// Play the spawning effect from all of the particle systems.
 		foreach(ParticleSystem p in GetComponentsInChildren<ParticleSystem>())
