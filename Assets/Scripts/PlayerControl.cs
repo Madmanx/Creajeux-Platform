@@ -4,9 +4,9 @@ using System.Collections;
 
 public class PlayerControl : NetworkBehaviour
 {
-	[HideInInspector]
+	[HideInInspector, SyncVar]
 	public bool facingRight = true;			// For determining which way the player is currently facing.
-	[HideInInspector]
+	[HideInInspector, SyncVar]
 	public bool jump = false;				// Condition for whether the player should jump.
 
 
@@ -39,16 +39,40 @@ public class PlayerControl : NetworkBehaviour
             return;
 
 		// The player is grounded if a linecast to the groundcheck position hits anything on the ground layer.
-		grounded = Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));  
+		grounded = Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground"));
 
-		// If the jump button is pressed and the player is grounded then the player should jump.
-		if(Input.GetButtonDown("Jump") && grounded)
-			jump = true;
+        // If the jump button is pressed and the player is grounded then the player should jump.
+        if (Input.GetButtonDown("Jump") && grounded)
+            CmdJump();
 	}
 
 
 	void FixedUpdate ()
 	{
+
+        if ((transform.localScale.x > 0) != facingRight)
+        {
+            // Multiply the player's x local scale by -1.
+            Vector3 theScale = transform.localScale;
+            theScale.x *= -1;
+            transform.localScale = theScale;
+        }
+
+        bool jumped = jump;
+        // If the player should jump...
+		if(jump)
+		{
+			// Set the Jump animator trigger parameter.
+			anim.SetTrigger("Jump");
+
+			// Play a random jump audio clip.
+			int i = Random.Range(0, jumpClips.Length);
+			AudioSource.PlayClipAtPoint(jumpClips[i], transform.position);
+
+			// Make sure the player can't jump again until the jump conditions from Update are satisfied.
+			jump = false;
+		}
+
         if (!isLocalPlayer)
             return;
 
@@ -71,44 +95,36 @@ public class PlayerControl : NetworkBehaviour
 		// If the input is moving the player right and the player is facing left...
 		if(h > 0 && !facingRight)
 			// ... flip the player.
-			Flip();
+			CmdFlip();
 		// Otherwise if the input is moving the player left and the player is facing right...
 		else if(h < 0 && facingRight)
 			// ... flip the player.
-			Flip();
+			CmdFlip();
 
-		// If the player should jump...
-		if(jump)
-		{
-			// Set the Jump animator trigger parameter.
-			anim.SetTrigger("Jump");
 
-			// Play a random jump audio clip.
-			int i = Random.Range(0, jumpClips.Length);
-			AudioSource.PlayClipAtPoint(jumpClips[i], transform.position);
-
-			// Add a vertical force to the player.
-			GetComponent<Rigidbody2D>().AddForce(new Vector2(0f, jumpForce));
-
-			// Make sure the player can't jump again until the jump conditions from Update are satisfied.
-			jump = false;
-		}
+        if(jumped)
+            // Add a vertical force to the player.
+            GetComponent<Rigidbody2D>().AddForce(new Vector2(0f, jumpForce));
+	
 	}
 	
 	
-	void Flip ()
+    [Command]
+	void CmdFlip ()
 	{
 		// Switch the way the player is labelled as facing.
 		facingRight = !facingRight;
-
-		// Multiply the player's x local scale by -1.
-		Vector3 theScale = transform.localScale;
-		theScale.x *= -1;
-		transform.localScale = theScale;
 	}
 
+	
+    [Command]
+	void CmdJump ()
+	{
+        jump = true;
 
-	public IEnumerator Taunt()
+    }
+
+    public IEnumerator Taunt()
 	{
 		// Check the random chance of taunting.
 		float tauntChance = Random.Range(0f, 100f);
