@@ -4,6 +4,7 @@ using System.Collections;
 
 public class PlayerHealth : NetworkBehaviour
 {	
+    [SyncVar]
 	public float health = 100f;					// The player's health.
 	public float repeatDamagePeriod = 2f;		// How frequently the player can be damaged.
 	public AudioClip[] ouchClips;				// Array of clips to play when the player is damaged.
@@ -21,22 +22,18 @@ public class PlayerHealth : NetworkBehaviour
 	{
 		// Setting up references.
 		playerControl = GetComponent<PlayerControl>();
-		healthBar = GameObject.Find("HealthBar").GetComponent<SpriteRenderer>();
+        var obj = transform.GetChild(12).GetChild(0);
+		healthBar = obj.GetComponent<SpriteRenderer>();
 		anim = GetComponent<Animator>();
 
 		// Getting the intial scale of the healthbar (whilst the player has full health).
 		healthScale = healthBar.transform.localScale;
 	}
 
-    private void Start()
-    {
-        if (!isLocalPlayer)
-            Destroy(this);
-    }
-
-
     void OnCollisionEnter2D (Collision2D col)
 	{
+        if (!hasAuthority)
+            return;
 		// If the colliding gameobject is an Enemy...
 		if(col.gameObject.tag == "Enemy")
 		{
@@ -80,8 +77,12 @@ public class PlayerHealth : NetworkBehaviour
 		}
 	}
 
+    private void FixedUpdate()
+    {
+        UpdateHealthBar();
+    }
 
-	void TakeDamage (Transform enemy)
+    void TakeDamage (Transform enemy)
 	{
 		// Make sure the player can't jump.
 		playerControl.jump = false;
@@ -94,9 +95,6 @@ public class PlayerHealth : NetworkBehaviour
 
 		// Reduce the player's health by 10.
 		health -= damageAmount;
-
-		// Update what the health bar looks like.
-		UpdateHealthBar();
 
 		// Play a random clip of the player getting hurt.
 		int i = Random.Range (0, ouchClips.Length);
