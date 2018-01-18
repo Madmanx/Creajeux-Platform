@@ -24,13 +24,15 @@ public class PlayerControl : NetworkBehaviour
 	private bool grounded = false;			// Whether or not the player is grounded.
 	private Animator anim;					// Reference to the player's animator component.
 
+    private Gun gun; 
 
 	void Awake()
 	{
 		// Setting up references.
 		groundCheck = transform.Find("groundCheck");
 		anim = GetComponent<Animator>();
-	}
+        gun = GetComponentInChildren<Gun>();
+    }
 
 
     void Update()
@@ -165,8 +167,6 @@ public class PlayerControl : NetworkBehaviour
     [Command]
     public void CmdDoFire()
     {
-        var objgun = transform.GetChild(11);
-        var gun = objgun.GetComponent<Gun>();
         // If the player is facing right...
         if (facingRight)
         {
@@ -188,9 +188,6 @@ public class PlayerControl : NetworkBehaviour
     [ClientRpc]
     public void RpcDoFire()
     {
-        var gun = GetComponentInChildren<Gun>();
         gun.ShootFX();
-
-
     }
 }
