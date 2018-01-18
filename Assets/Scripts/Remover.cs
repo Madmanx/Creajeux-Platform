@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
-
+using UnityEngine.Networking;
 public class Remover : MonoBehaviour
 {
 	public GameObject splash;
@@ -27,6 +27,7 @@ public class Remover : MonoBehaviour
 			Destroy (col.gameObject);
 			// ... reload the level.
 			StartCoroutine("ReloadGame");
+
 		}
 		else
 		{
@@ -42,7 +43,14 @@ public class Remover : MonoBehaviour
 	{			
 		// ... pause briefly
 		yield return new WaitForSeconds(2);
-		// ... and then reload the level.
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex, LoadSceneMode.Single);
+        // ... and then reload the level.
+
+
+        NetworkServer.DisconnectAll();
+        NetworkServer.ClearSpawners();
+        //NetworkServer.ClearLocalObjects();
+        //NetworkServer.ClearHandlers();
+        NetworkLobbyManager.Shutdown();
+        SceneManager.LoadScene(0, LoadSceneMode.Single);
 	}
 }
