@@ -2,3 +2,9 @@
 Library/
 
 Temp/
+
+\.vs/
+
+Creajeux-Platform\.csproj
+
+Creajeux-Platform\.sln

@@ -13,22 +13,27 @@ public class PickupSpawner : MonoBehaviour
 
 	private PlayerHealth playerHealth;			// Reference to the PlayerHealth script.
 
+    public void FixedUpdate()
+    {
+        // Setting up the reference.
+        if (playerHealth == null)
+        {
+            var heroes = GameObject.FindGameObjectsWithTag("Player");
+            foreach (var hero in heroes)
+            {
+                playerHealth = hero.GetComponent<PlayerHealth>();
 
-	void Awake ()
-	{
-		// Setting up the reference.
-		playerHealth = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerHealth>();
-	}
+                // Start the first delivery.
+                StartCoroutine(DeliverPickup());
+            }
+
+            if (playerHealth == null)
+                return;
+        }
+    }
 
 
-	void Start ()
-	{
-		// Start the first delivery.
-		StartCoroutine(DeliverPickup());
-	}
-
-
-	public IEnumerator DeliverPickup()
+    public IEnumerator DeliverPickup()
 	{
 		// Wait for the delivery delay.
 		yield return new WaitForSeconds(pickupDeliveryTime);
